@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.KeyPair;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
@@ -27,6 +29,7 @@ import java.util.Scanner;
  *  1 2 3 
  *  8   4
  *  7 6 5
+ *  {{1,2,3},{8,0,4},{7,6,5}}
  *
  * The final configuration (i.e., the goal state) above is not explicitly represented as an object 
  * of the State class. 
@@ -71,7 +74,7 @@ public class State implements Cloneable, Comparable<State>
 		this.board = board;
 		this.previous = null;
 		this.next = null;
-		this.predecessor =null;
+		this.predecessor = null;
 		this.move = null;
 		this.numMoves = 0;
 	}
@@ -129,13 +132,17 @@ public class State implements Cloneable, Comparable<State>
      * 
      *     a) set the predecessor of the successor state to this state;
      *     b) set the private instance variable move of the successor state to the parameter m; 
-     *     c) Set the links next and previous to null;  
+     *     c) Set the links next and previous to null;
      *     d) Set the variable numMoves for the successor state to this.numMoves + 1. 
      * 
      * @param m  one of the moves LEFT, RIGHT, UP, DOWN, DBL_LEFT, DBL_RIGHT, DBL_UP, and DBL_DOWN
+	 *           LEFT -> move 0 block to the right
+	 *           RIGHT -> move 0 block to the left
+	 *           UP -> move 0 block down
+	 *           DOWN -> move 0 block up
      * @return null  			if the successor state is this.predecessor
      *         successor state  otherwise 
-     * @throws IllegalArgumentException if LEFT when the empty square is in the right column, or  
+     * @throws IllegalArgumentException if LEFT when the empty square is in the right column, or
      *                                  if RIGHT when the empty square is in the left column, or
      *                                  if UP when the empty square is in the bottom row, or 
      *                                  if DOWN when the empty square is in the top row, or
@@ -144,20 +151,109 @@ public class State implements Cloneable, Comparable<State>
      *                                  if DBL_UP when the empty square is not in the top row, or 
      *                                  if DBL_DOWN when the empty square is not in the bottom row. 
      */                                  
-    public State successorState(Move m) throws IllegalArgumentException 
+    public State successorState(Move m) throws IllegalArgumentException
     {
-
+		int empty_row = 0;
+		int empty_col = 0;
+		for (int i = 0; i < this.board.length; i++)
+		{
+			for (int j = 0; j < this.board[0].length; j++)
+			{
+				if (this.board[i][j] == 0)
+				{
+					empty_row = i;
+					empty_col = j;
+				}
+			}
+		}
 		switch (m)
 		{
 			case LEFT:
-
-				break;
+				if (empty_col == 2)
+				{
+					throw new IllegalArgumentException();
+				}
+				else
+				{
+					State s = (State) this.clone();
+					s.predecessor = this;
+					s.move = m;
+					s.numMoves = this.numMoves + 1;
+					s.board[empty_row][empty_col] = s.board[empty_row][empty_col + 1];
+					s.board[empty_row][empty_col + 1] = 0;
+					if (this.predecessor != null && this.predecessor.equals(s))
+					{
+						return null;
+					}
+					else
+					{
+						return s;
+					}
+				}
 			case RIGHT:
-				break;
+				if (empty_col == 0)
+				{
+					throw new IllegalArgumentException();
+				}
+				else
+				{
+					State s = (State) this.clone();
+					s.predecessor = this;
+					s.move = m;
+					s.numMoves = this.numMoves + 1;
+					s.board[empty_row][empty_col] = s.board[empty_row][empty_col - 1];
+					s.board[empty_row][empty_col - 1] = 0;
+					if (this.predecessor != null && this.predecessor.equals(s))
+					{
+						return null;
+					}
+					else
+					{
+						return s;
+					}				}
 			case UP:
-				break;
+				if (empty_row == 2)
+				{
+					throw new IllegalArgumentException();
+				}
+				else
+				{
+					State s = (State) this.clone();
+					s.predecessor = this;
+					s.move = m;
+					s.numMoves = this.numMoves + 1;
+					s.board[empty_row][empty_col] = s.board[empty_row + 1][empty_col];
+					s.board[empty_row + 1][empty_col] = 0;
+					if (this.predecessor != null && this.predecessor.equals(s))
+					{
+						return null;
+					}
+					else
+					{
+						return s;
+					}				}
 			case DOWN:
-				break;
+				if (empty_row == 0)
+				{
+					throw new IllegalArgumentException();
+				}
+				else
+				{
+					State s = (State) this.clone();
+					s.predecessor = this;
+					s.move = m;
+					s.numMoves = this.numMoves + 1;
+					s.board[empty_row][empty_col] = s.board[empty_row - 1][empty_col];
+					s.board[empty_row - 1][empty_col] = 0;
+					if (this.predecessor != null && this.predecessor.equals(s))
+					{
+						return null;
+					}
+					else
+					{
+						return s;
+					}
+				}
 			case DBL_LEFT:
 				break;
 			case DBL_RIGHT:
@@ -167,7 +263,7 @@ public class State implements Cloneable, Comparable<State>
 			case DBL_DOWN:
 				break;
 		}
-    	return null;
+		throw new IllegalArgumentException("Invalid move: " + m);
     }
     
         
@@ -180,10 +276,37 @@ public class State implements Cloneable, Comparable<State>
      * 
      * @return true if the puzzle starting in this state can be rearranged into the goal state.
      */
-    public boolean solvable()
+    public boolean solvable() //done
     {
-    	// TODO 
-    	return false; 
+		int[] flat = new int[9];
+		int idx = 0;
+		int inv_c = 0;
+		for (int i = 0; i < this.board.length; i++)
+		{
+			for (int j = 0; j < this.board[0].length; j++)
+			{
+				flat[idx] = this.board[i][j];
+				idx++;
+			}
+		}
+		for (int i = 0; i < flat.length; i++)
+		{
+			for (int j = i+1; j < flat.length; j++)
+			{
+				if (flat[i] > flat[j] && flat[i] != 0 && flat[j] != 0)
+				{
+					inv_c++;
+				}
+			}
+		}
+		if ((inv_c - 7) % 2 == 0)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
     }
     
     
@@ -196,10 +319,10 @@ public class State implements Cloneable, Comparable<State>
      * 
      * @return
      */
-    public boolean isGoalState()
+    public boolean isGoalState() //done
     {
-    	// TODO 
-    	return false; 
+    	int[][] goal = {{1,2,3},{8,0,4},{7,6,5}};
+    	return Arrays.deepEquals(this.board, goal);
     }
     
     
@@ -214,15 +337,33 @@ public class State implements Cloneable, Comparable<State>
      * 
      * 2   3
      * 1 8 4
-     * 7 6 5  
+     * 7 6 5
      * 
      */
-    @Override 
-    public String toString()
-    {
-    	// TODO 
-    	return null; 
-    }
+    @Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < this.board.length; i++)
+		{
+			for (int j = 0; j < this.board[0].length; j++)
+			{
+				if (j != 0)
+				{
+					sb.append(" ");
+				}
+				if (this.board[i][j] == 0)
+				{
+					sb.append(" ");
+				}
+				else
+				{
+					sb.append(this.board[i][j]);
+				}
+			}
+			sb.append("\n");
+		}
+		return sb.toString();
+	}
     
     
     /**
@@ -234,8 +375,16 @@ public class State implements Cloneable, Comparable<State>
     @Override
     public Object clone()
     {
-    	// TODO 
-    	return null; 
+		int[][] deepcpy_board = new int[this.board.length][this.board[0].length];
+		for (int i = 0; i < this.board.length; i++)
+		{
+			deepcpy_board[i] = Arrays.copyOf(this.board[i], this.board[i].length);
+		}
+		State s = new State(deepcpy_board);
+		s.previous = null;
+		s.next = null;
+		s.predecessor = null;
+    	return s;
     }
   
 
@@ -244,10 +393,10 @@ public class State implements Cloneable, Comparable<State>
      * have the same content.
      */
     @Override 
-    public boolean equals(Object o)
+    public boolean equals(Object o) //done
     {
-    	// TODO 
-    	return false; 
+		State s2 = (State) o;
+		return Arrays.deepEquals(this.board, s2.board);
     }
         
     
@@ -263,10 +412,22 @@ public class State implements Cloneable, Comparable<State>
      * @return estimated number of moves from the initial state to the goal state via this state.
      * @throws IllegalArgumentException if heuristic is none of TileMismatch, MahattanDist, DoubleMoveHeuristic. 
      */
-    public int cost() throws IllegalArgumentException
+    public int cost() throws IllegalArgumentException //done
     {
-    	// TODO 
-    	return 0; 
+		try
+		{
+			switch (heu)
+			{
+				case TileMismatch -> {return this.numMoves + this.computeNumMismatchedTiles();}
+				case ManhattanDist -> {return this.numMoves + this.computeManhattanDistance();}
+				case DoubleMoveHeuristic -> {return this.numMoves + this.computeNumSingleDoubleMoves();}
+			}
+		}
+		catch (IllegalArgumentException e)
+		{
+			throw new IllegalArgumentException();
+		}
+        return 0;
     }
 
     
@@ -280,11 +441,10 @@ public class State implements Cloneable, Comparable<State>
      * Call the method cost(). This comparison will be used in maintaining the OPEN list by the A* algorithm.
      */
     @Override
-    public int compareTo(State s)
+    public int compareTo(State s) //done
     {
-    	// TODO 
-    	return 0; 
-    }
+		return Integer.compare(this.cost(), s.cost());
+	}
     
 
     /**
@@ -293,10 +453,21 @@ public class State implements Cloneable, Comparable<State>
      * 
      * @return the number of mismatched tiles between this state and the goal state. 
      */
-	private int computeNumMismatchedTiles()
+	private int computeNumMismatchedTiles() //done
 	{
-		// TODO 
-		return 0; 
+		int[][] goal = {{1,2,3},{8,0,4},{7,6,5}};
+		int count = 0;
+		for (int i = 0; i < this.board.length; i++)
+		{
+			for (int j = 0; j < this.board[0].length; j++)
+			{
+				if(goal[i][j] != this.board[i][j])
+				{
+					count++;
+				}
+			}
+		}
+		return count;
 	}
 
 	
@@ -306,10 +477,35 @@ public class State implements Cloneable, Comparable<State>
 	 * 
 	 * @return the Manhattan distance between this state and the goal state. 
 	 */
-	private int computeManhattanDistance()
+	private int computeManhattanDistance() //done
 	{
-		// TODO 
-		return 0; 
+		HashMap<Integer,int[]> hm = new HashMap<>();
+		int[][] goal = {{1,2,3},{8,0,4},{7,6,5}};
+		int count = 0;
+		int sum = 0;
+
+		for (int i = 0; i < this.board.length; i++)
+		{
+			for (int j = 0; j < this.board[0].length; j++)
+			{
+				int[] arr = {i,j};
+				hm.put(goal[i][j],arr);
+			}
+		}
+
+		for (int i = 0; i < this.board.length; i++)
+		{
+			for (int j = 0; j < this.board[0].length; j++)
+			{
+				if(this.board[i][j] != goal[i][j] && this.board[i][j] != 0)
+				{
+					int[] cord = hm.get(this.board[i][j]);
+					int man_d = Math.abs(cord[0] - i) + Math.abs(cord[1] - j);
+					sum = sum + man_d;
+				}
+			}
+		}
+		return sum;
 	}
 	
 	

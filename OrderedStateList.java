@@ -38,9 +38,14 @@ public class OrderedStateList
 	   */
 	  public OrderedStateList(Heuristic h, boolean isOpen)
 	  {
-		  //	TODO
-		  State.heu = h;   // initialize heuristic used for evaluating all State objects. 
+		  State.heu = h;   // initialize heuristic used for evaluating all State objects.
+		  this.size = 0;
+		  this.isOPEN = isOpen;
 
+		  int[][] dummyboard = {{-1,-1,-1}, {-1,-1,-1}, {-1,-1,-1}};
+		  this.head = new State(dummyboard);
+		  head.next = head;
+		  head.previous = head;
 	  }
 
 	  
@@ -61,7 +66,34 @@ public class OrderedStateList
 	   */
 	  public void addState(State s)
 	  {
-		  // TODO 
+		  if(this.size == 0)
+		  {
+			  s.previous = head;
+			  s.next = head;
+			  head.next = s;
+			  head.previous = s;
+		  }
+		  else
+		  {
+			  State cur = this.head.next;
+			  while(cur != head)
+			  {
+				  if(compareStates(s,cur) <= 0)
+				  {
+					  s.next = cur;
+					  s.previous = cur.previous;
+					  cur.previous.next = s;
+					  cur.previous = s;
+					  return;
+				  }
+				  cur = cur.next;
+			  }
+			  s.next = head;
+			  s.previous = head.previous;
+			  head.previous.next = s;
+			  head.previous = s;
+		  }
+		  size++;
 	  }
 	  
 	  
@@ -77,8 +109,16 @@ public class OrderedStateList
 	   */
 	  public State findState(State s)
 	  {
-		  // TODO 
-		  return null; 
+		  State cur = head.next;
+		  while (cur != head)
+		  {
+			  if (cur.equals(s))
+			  {
+				  return cur;
+			  }
+			  cur = cur.next;
+		  }
+		  return null;
 	  }
 	  
 	  
@@ -91,7 +131,24 @@ public class OrderedStateList
 	   */
 	  public void removeState(State s) throws IllegalStateException
 	  {
-		  // TODO 
+		  if(size == 0)
+		  {
+			  throw new IllegalStateException();
+		  }
+		  else
+		  {
+			  State del = findState(s);
+			  if(del == null)
+			  {
+				  throw new IllegalStateException();
+			  }
+			  else
+			  {
+				  del.previous.next = del.next;
+				  del.next.previous = del.previous;
+				  size--;
+			  }
+		  }
 	  }
 	  
 	  
@@ -103,8 +160,18 @@ public class OrderedStateList
 	   */
 	  public State remove()
 	  {
-		  // TODO
-		  return null; 
+		  if(size == 0)
+		  {
+			  return null;
+		  }
+		  else
+		  {
+			  State pop = head.next;
+			  pop.previous.next = pop.next;
+			  pop.next.previous = pop.previous;
+			  size--;
+			  return pop;
+		  }
 	  }
 	  
 	  

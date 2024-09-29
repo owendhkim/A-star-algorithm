@@ -28,7 +28,13 @@ public class StateComparator implements Comparator<State>
 	@Override
 	public int compare(State s1, State s2)
 	{
-		// TODO 
-	    return 0;
-	}  		
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				if (s1.board[i][j] != s2.board[i][j]) {
+					return Integer.compare(s1.board[i][j], s2.board[i][j]);
+				}
+			}
+		}
+		return 0; // States are equal
+	}
 }

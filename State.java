@@ -455,19 +455,27 @@ public class State implements Cloneable, Comparable<State>
      */
 	private int computeNumMismatchedTiles() //done
 	{
-		int[][] goal = {{1,2,3},{8,0,4},{7,6,5}};
-		int count = 0;
-		for (int i = 0; i < this.board.length; i++)
+		if(this.numMismatchedTiles >= 0)
 		{
-			for (int j = 0; j < this.board[0].length; j++)
+			return this.numMismatchedTiles;
+		}
+		else
+		{
+			int[][] goal = {{1,2,3},{8,0,4},{7,6,5}};
+			int count = 0;
+			for (int i = 0; i < this.board.length; i++)
 			{
-				if(goal[i][j] != this.board[i][j])
+				for (int j = 0; j < this.board[0].length; j++)
 				{
-					count++;
+					if(goal[i][j] != this.board[i][j])
+					{
+						count++;
+					}
 				}
 			}
+			this.numMismatchedTiles = count;
+			return count;
 		}
-		return count;
 	}
 
 	
@@ -479,33 +487,41 @@ public class State implements Cloneable, Comparable<State>
 	 */
 	private int computeManhattanDistance() //done
 	{
-		HashMap<Integer,int[]> hm = new HashMap<>();
-		int[][] goal = {{1,2,3},{8,0,4},{7,6,5}};
-		int count = 0;
-		int sum = 0;
-
-		for (int i = 0; i < this.board.length; i++)
+		if(this.ManhattanDistance >= 0)
 		{
-			for (int j = 0; j < this.board[0].length; j++)
-			{
-				int[] arr = {i,j};
-				hm.put(goal[i][j],arr);
-			}
+			return this.ManhattanDistance;
 		}
-
-		for (int i = 0; i < this.board.length; i++)
+		else
 		{
-			for (int j = 0; j < this.board[0].length; j++)
+			HashMap<Integer,int[]> hm = new HashMap<>();
+			int[][] goal = {{1,2,3},{8,0,4},{7,6,5}};
+			int count = 0;
+			int sum = 0;
+
+			for (int i = 0; i < this.board.length; i++)
 			{
-				if(this.board[i][j] != goal[i][j] && this.board[i][j] != 0)
+				for (int j = 0; j < this.board[0].length; j++)
 				{
-					int[] cord = hm.get(this.board[i][j]);
-					int man_d = Math.abs(cord[0] - i) + Math.abs(cord[1] - j);
-					sum = sum + man_d;
+					int[] arr = {i,j};
+					hm.put(goal[i][j],arr);
 				}
 			}
+
+			for (int i = 0; i < this.board.length; i++)
+			{
+				for (int j = 0; j < this.board[0].length; j++)
+				{
+					if(this.board[i][j] != goal[i][j] && this.board[i][j] != 0)
+					{
+						int[] cord = hm.get(this.board[i][j]);
+						int man_d = Math.abs(cord[0] - i) + Math.abs(cord[1] - j);
+						sum = sum + man_d;
+					}
+				}
+			}
+			this.ManhattanDistance = sum;
+			return sum;
 		}
-		return sum;
 	}
 	
 	

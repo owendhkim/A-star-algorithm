@@ -113,10 +113,13 @@ public class State implements Cloneable, Comparable<State>
 		}
 		catch (IllegalArgumentException | FileNotFoundException e)
 		{
-			System.out.println("Exception caught: " + e.getMessage());
-			e.printStackTrace();
+			if (e instanceof IllegalArgumentException) {
+				throw (IllegalArgumentException) e;
+			} else if (e instanceof FileNotFoundException) {
+				throw (FileNotFoundException) e;
+			}
 		}
-
+		this.board = board;
 		this.previous = null;
 		this.next = null;
 		this.predecessor =null;
@@ -153,6 +156,7 @@ public class State implements Cloneable, Comparable<State>
      */                                  
     public State successorState(Move m) throws IllegalArgumentException
     {
+		State s = (State) this.clone();
 		int empty_row = 0;
 		int empty_col = 0;
 		for (int i = 0; i < this.board.length; i++)
@@ -166,104 +170,64 @@ public class State implements Cloneable, Comparable<State>
 				}
 			}
 		}
-		switch (m)
-		{
-			case LEFT:
-				if (empty_col == 2)
-				{
-					throw new IllegalArgumentException();
-				}
-				else
-				{
-					State s = (State) this.clone();
-					s.predecessor = this;
-					s.move = m;
-					s.numMoves = this.numMoves + 1;
-					s.board[empty_row][empty_col] = s.board[empty_row][empty_col + 1];
-					s.board[empty_row][empty_col + 1] = 0;
-					if (this.predecessor != null && this.predecessor.equals(s))
-					{
-						return null;
+		try {
+			switch (m) {
+				case LEFT:
+					if (empty_col == 2) {
+						throw new IllegalArgumentException();
+					} else {
+						s.board[empty_row][empty_col] = s.board[empty_row][empty_col + 1];
+						s.board[empty_row][empty_col + 1] = 0;
 					}
-					else
-					{
-						return s;
+					break;
+				case RIGHT:
+					if (empty_col == 0) {
+						throw new IllegalArgumentException();
+					} else {
+						s.board[empty_row][empty_col] = s.board[empty_row][empty_col - 1];
+						s.board[empty_row][empty_col - 1] = 0;
 					}
-				}
-			case RIGHT:
-				if (empty_col == 0)
-				{
-					throw new IllegalArgumentException();
-				}
-				else
-				{
-					State s = (State) this.clone();
-					s.predecessor = this;
-					s.move = m;
-					s.numMoves = this.numMoves + 1;
-					s.board[empty_row][empty_col] = s.board[empty_row][empty_col - 1];
-					s.board[empty_row][empty_col - 1] = 0;
-					if (this.predecessor != null && this.predecessor.equals(s))
-					{
-						return null;
+					break;
+				case UP:
+					if (empty_row == 2) {
+						throw new IllegalArgumentException();
+					} else {
+						s.board[empty_row][empty_col] = s.board[empty_row + 1][empty_col];
+						s.board[empty_row + 1][empty_col] = 0;
 					}
-					else
-					{
-						return s;
-					}				}
-			case UP:
-				if (empty_row == 2)
-				{
-					throw new IllegalArgumentException();
-				}
-				else
-				{
-					State s = (State) this.clone();
-					s.predecessor = this;
-					s.move = m;
-					s.numMoves = this.numMoves + 1;
-					s.board[empty_row][empty_col] = s.board[empty_row + 1][empty_col];
-					s.board[empty_row + 1][empty_col] = 0;
-					if (this.predecessor != null && this.predecessor.equals(s))
-					{
-						return null;
+					break;
+				case DOWN:
+					if (empty_row == 0) {
+						throw new IllegalArgumentException();
+					} else {
+						s.board[empty_row][empty_col] = s.board[empty_row - 1][empty_col];
+						s.board[empty_row - 1][empty_col] = 0;
 					}
-					else
-					{
-						return s;
-					}				}
-			case DOWN:
-				if (empty_row == 0)
-				{
-					throw new IllegalArgumentException();
-				}
-				else
-				{
-					State s = (State) this.clone();
-					s.predecessor = this;
-					s.move = m;
-					s.numMoves = this.numMoves + 1;
-					s.board[empty_row][empty_col] = s.board[empty_row - 1][empty_col];
-					s.board[empty_row - 1][empty_col] = 0;
-					if (this.predecessor != null && this.predecessor.equals(s))
-					{
-						return null;
-					}
-					else
-					{
-						return s;
-					}
-				}
-			case DBL_LEFT:
-				break;
-			case DBL_RIGHT:
-				break;
-			case DBL_UP:
-				break;
-			case DBL_DOWN:
-				break;
+					break;
+				case DBL_LEFT:
+					return null;
+
+				case DBL_RIGHT:
+					return null;
+
+				case DBL_UP:
+					return null;
+
+				case DBL_DOWN:
+					return null;
+
+			}
+		} catch (IllegalArgumentException e) {
+			return null;
 		}
-		throw new IllegalArgumentException("Invalid move: " + m);
+		s.predecessor = this;
+		s.move = m;
+		s.numMoves = this.numMoves + 1;
+		if (this.predecessor != null && this.predecessor.equals(s)) {
+			return null;
+		} else {
+			return s;
+		}
     }
     
         
@@ -443,7 +407,18 @@ public class State implements Cloneable, Comparable<State>
     @Override
     public int compareTo(State s) //done
     {
-		return Integer.compare(this.cost(), s.cost());
+		if(this.cost() < s.cost())
+		{
+			return -1;
+		}
+		else if (this.cost() == s.cost())
+		{
+			return 0;
+		}
+		else
+		{
+			return 1;
+		}
 	}
     
 

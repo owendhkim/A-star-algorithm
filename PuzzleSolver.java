@@ -1,6 +1,7 @@
 package edu.iastate.cs472.proj1;
 
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 
 /**
  *  
@@ -37,9 +38,10 @@ public class PuzzleSolver
 		
 		// You may make it interactive by repeatedly accepting puzzle files and print out 
 		// solutions.  (No extra credit but good for debugging and for the user.)
-		String fileNames[] = new String[] {"8Puzzle.txt"}; 
-		
-		// TODO 
+		String fileNames[] = new String[] {"8Puzzle.txt"};
+		State s = new State(fileNames[0]);
+		System.out.println(EightPuzzle.solve8Puzzle(s));
+
 	}
 
 }

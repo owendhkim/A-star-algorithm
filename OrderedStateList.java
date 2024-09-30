@@ -190,8 +190,14 @@ public class OrderedStateList
 	   */
 	  private int compareStates(State s1, State s2)
 	  {
-		  // TODO 
-		  
-		  return 0; 
+		  if(isOPEN)
+		  {
+			  return s1.compareTo(s2);
+		  }
+		  else
+		  {
+			  StateComparator sc = new StateComparator();
+			  return sc.compare(s1,s2);
+		  }
 	  }
 }

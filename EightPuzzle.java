@@ -44,7 +44,7 @@ public class EightPuzzle
 		Heuristic h[] = {Heuristic.TileMismatch, Heuristic.ManhattanDist, Heuristic.DoubleMoveHeuristic };
 		String [] moves = new String[3]; 
 		
-		for (int i = 0; i < 2; i++)
+		for (int i = 0; i < 3; i++)
 		{
 			moves[i] = AStar(s0, h[i]); 
 		}
@@ -71,8 +71,16 @@ public class EightPuzzle
 		// Initialize the two lists used by the algorithm. 
 		OrderedStateList OPEN = new OrderedStateList(h, true); 
 		OrderedStateList CLOSE = new OrderedStateList(h, false);
-					
-		
+		Move[] moves = new Move[0];
+		if(h == Heuristic.TileMismatch || h == Heuristic.ManhattanDist)
+		{
+			moves = new Move[]{Move.LEFT, Move.RIGHT, Move.UP, Move.DOWN};
+		}
+		else if (h == Heuristic.DoubleMoveHeuristic)
+		{
+			moves = Move.values();
+		}
+
 		// Implement the algorithm described in Section 3 to solve the puzzle. 
 		// Once a goal state s is reached, call solutionPath(s) and return the solution string.
 		OPEN.addState(s0);
@@ -86,7 +94,7 @@ public class EightPuzzle
 			else
 			{
 				CLOSE.addState(popped);
-				for (Move m : Move.values())
+				for (Move m : moves)
 				{
 					State child = popped.successorState(m);
 					if(child != null)
@@ -111,10 +119,10 @@ public class EightPuzzle
 							{
 								child.predecessor = popped;
 								OPEN.addState(child);
+								CLOSE.removeState(child);
 							}
 						}
 					}
-
 				}
 			}
 		}
@@ -166,7 +174,4 @@ public class EightPuzzle
 		sb.insert(0,count + " moves in total (heuristic: " + h + ")\n\n");
 		return sb.toString();
 	}
-	
-	
-	
 }

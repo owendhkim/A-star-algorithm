@@ -205,17 +205,41 @@ public class State implements Cloneable, Comparable<State>
 					}
 					break;
 				case DBL_LEFT:
-					return null;
-
+					if (empty_col == 2 || empty_col == 1) {
+						throw new IllegalArgumentException();
+					} else {
+						s.board[empty_row][empty_col] = s.board[empty_row][empty_col + 1];
+						s.board[empty_row][empty_col + 1] = s.board[empty_row][empty_col + 2];
+						s.board[empty_row][empty_col + 2] = 0;
+					}
+					break;
 				case DBL_RIGHT:
-					return null;
-
+					if (empty_col == 0 || empty_col == 1) {
+						throw new IllegalArgumentException();
+					} else {
+						s.board[empty_row][empty_col] = s.board[empty_row][empty_col - 1];
+						s.board[empty_row][empty_col - 1] = s.board[empty_row][empty_col - 2];
+						s.board[empty_row][empty_col - 2] = 0;
+					}
+					break;
 				case DBL_UP:
-					return null;
-
+					if (empty_row == 2 || empty_row == 1) {
+						throw new IllegalArgumentException();
+					} else {
+						s.board[empty_row][empty_col] = s.board[empty_row + 1][empty_col];
+						s.board[empty_row + 1][empty_col] = s.board[empty_row + 2][empty_col];
+						s.board[empty_row + 2][empty_col] = 0;
+					}
+					break;
 				case DBL_DOWN:
-					return null;
-
+					if (empty_row == 0 || empty_row == 1) {
+						throw new IllegalArgumentException();
+					} else {
+						s.board[empty_row][empty_col] = s.board[empty_row - 1][empty_col];
+						s.board[empty_row - 1][empty_col] = s.board[empty_row - 2][empty_col];
+						s.board[empty_row - 2][empty_col] = 0;
+					}
+					break;
 			}
 		} catch (IllegalArgumentException e) {
 			return null;
@@ -470,7 +494,6 @@ public class State implements Cloneable, Comparable<State>
 		{
 			HashMap<Integer,int[]> hm = new HashMap<>();
 			int[][] goal = {{1,2,3},{8,0,4},{7,6,5}};
-			int count = 0;
 			int sum = 0;
 
 			for (int i = 0; i < this.board.length; i++)
@@ -481,7 +504,6 @@ public class State implements Cloneable, Comparable<State>
 					hm.put(goal[i][j],arr);
 				}
 			}
-
 			for (int i = 0; i < this.board.length; i++)
 			{
 				for (int j = 0; j < this.board[0].length; j++)
@@ -507,9 +529,40 @@ public class State implements Cloneable, Comparable<State>
 	 * @return the value of the private variable numSingleDoubleMoves that bounds from below the number of moves, 
 	 *         single or double, which will take this state to the goal state.
 	 */
-	private int computeNumSingleDoubleMoves()
-	{
-		// TODO 
-		return 0; 
+	private int computeNumSingleDoubleMoves() {
+		if (this.ManhattanDistance >= 0) {
+			return this.ManhattanDistance;
+		} else {
+			HashMap<Integer, int[]> hm = new HashMap<>();
+			int[][] goal = {{1, 2, 3}, {8, 0, 4}, {7, 6, 5}};
+			int sum = 0;
+
+			for (int i = 0; i < this.board.length; i++) {
+				for (int j = 0; j < this.board[0].length; j++) {
+					int[] arr = {i, j};
+					hm.put(goal[i][j], arr);
+				}
+			}
+			for (int i = 0; i < this.board.length; i++) {
+				for (int j = 0; j < this.board[0].length; j++) {
+					if (this.board[i][j] != goal[i][j] && this.board[i][j] != 0) {
+						int[] cord = hm.get(this.board[i][j]);
+						int dbl_mv_man_d_row = Math.abs(cord[0] - i);
+						int dbl_mv_man_d_col = Math.abs(cord[1] - j);
+						if(dbl_mv_man_d_row == 2)
+						{
+							dbl_mv_man_d_row = 1;
+						}
+						if(dbl_mv_man_d_col == 2)
+						{
+							dbl_mv_man_d_col = 1;
+						}
+						sum = sum + dbl_mv_man_d_row + dbl_mv_man_d_col;
+					}
+				}
+			}
+			this.ManhattanDistance = sum;
+			return sum;
+		}
 	}
 }

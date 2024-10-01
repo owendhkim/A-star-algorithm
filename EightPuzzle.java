@@ -29,7 +29,7 @@ public class EightPuzzle
 	{
 		if(!s0.solvable())
 		{
-			return "No solution exists for the following initial state:" + "\n" + s0.toString();
+			return "No solution exists for the following initial state:" + "\n\n" + s0.toString();
 		}
 		
 		// 1) If there exists no solution, return a message that starts with "No solution 
@@ -52,7 +52,7 @@ public class EightPuzzle
 		// 3) Combine the three solution strings into one that would print out in the 
 		//    output format specified in Section 6 of the project description.
 		
-		return moves[0];
+		return moves[0] + "\n\n" + moves[1] + "\n\n" + moves[2];
 	}
 
 	
@@ -119,7 +119,6 @@ public class EightPuzzle
 			}
 		}
 		return "OPEN list empty, exit with failure";
-						
 	}
 	
 	
@@ -142,11 +141,29 @@ public class EightPuzzle
 	{
 		State cur = goal;
 		StringBuilder sb = new StringBuilder();
+		int count = 0;
+		String h = "";
+		if(State.heu == Heuristic.TileMismatch)
+		{
+			h = "number of mismatched tiles";
+		}
+		else if (State.heu == Heuristic.ManhattanDist)
+		{
+			h = "the Manhattan distance";
+		}
+		else
+		{
+			h = "double moves allowed";
+		}
 		while(cur.predecessor != null)
 		{
-			sb.append(cur.toString());
+			sb.insert(0,"\n\n" + cur.toString());
+			sb.insert(0,"\n" + cur.move);
 			cur = cur.predecessor;
+			count++;
 		}
+		sb.insert(0,cur.toString());
+		sb.insert(0,count + " moves in total (heuristic: " + h + ")\n\n");
 		return sb.toString();
 	}
 	

@@ -40,8 +40,9 @@ public class PuzzleSolver
 		// solutions.  (No extra credit but good for debugging and for the user.)
 		String fileNames[] = new String[] {"8Puzzle.txt"};
 		State s = new State(fileNames[0]);
-		System.out.println(EightPuzzle.solve8Puzzle(s));
-
+		int[][] unsolvable = {{4,1,2},{5,3,0},{8,6,7}};
+		State s2 = new State(unsolvable);
+		System.out.println(EightPuzzle.solve8Puzzle(s2));
 	}
 
 }

@@ -442,7 +442,7 @@ public class State implements Cloneable, Comparable<State>
 			{
 				for (int j = 0; j < this.board[0].length; j++)
 				{
-					if(goal[i][j] != this.board[i][j])
+					if(goal[i][j] != this.board[i][j] && goal[i][j] != 0)
 					{
 						count++;
 					}

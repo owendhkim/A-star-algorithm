@@ -66,6 +66,7 @@ public class OrderedStateList
 	   */
 	  public void addState(State s)
 	  {
+		  size++;
 		  if(this.size == 0)
 		  {
 			  s.previous = head;
@@ -93,7 +94,6 @@ public class OrderedStateList
 			  head.previous.next = s;
 			  head.previous = s;
 		  }
-		  size++;
 	  }
 	  
 	  

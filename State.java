@@ -14,7 +14,7 @@ import java.util.Scanner;
 
 /**
  *  
- * @author
+ * @author Owen Kim
  *
  */
 
@@ -530,8 +530,8 @@ public class State implements Cloneable, Comparable<State>
 	 *         single or double, which will take this state to the goal state.
 	 */
 	private int computeNumSingleDoubleMoves() {
-		if (this.ManhattanDistance >= 0) {
-			return this.ManhattanDistance;
+		if (this.numSingleDoubleMoves >= 0) {
+			return this.numSingleDoubleMoves;
 		} else {
 			HashMap<Integer, int[]> hm = new HashMap<>();
 			int[][] goal = {{1, 2, 3}, {8, 0, 4}, {7, 6, 5}};
@@ -561,7 +561,7 @@ public class State implements Cloneable, Comparable<State>
 					}
 				}
 			}
-			this.ManhattanDistance = sum;
+			this.numSingleDoubleMoves = sum;
 			return sum;
 		}
 	}

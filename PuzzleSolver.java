@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 /**
  *  
- * @author
+ * @author Owen Kim
  *
  */
 
@@ -40,9 +40,11 @@ public class PuzzleSolver
 		// solutions.  (No extra credit but good for debugging and for the user.)
 		String fileNames[] = new String[] {"8Puzzle.txt"};
 		State s = new State(fileNames[0]);
-		int[][] unsolvable = {{4,1,2},{5,3,0},{8,6,7}};
+		int[][] unsolvable = {{4,1,2},{5,0,3},{8,6,7}};
 		State s2 = new State(unsolvable);
-		System.out.println(EightPuzzle.solve8Puzzle(s));
+		int[][] test = {{7,2,4},{1,0,6},{8,3,5}};
+		State t1  = new State(test);
+		System.out.println(EightPuzzle.solve8Puzzle(t1));
 	}
 
 }

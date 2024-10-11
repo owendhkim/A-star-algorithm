@@ -1,0 +1,10 @@
+# Project 1 - Solving 8-puzzle with a-star algorithm
+
+My h3 heuristic is counting the manhattan distance between the goal state,
+with double moves allowed. I count the manhattan distance and check if
+row or col value of it is 2, if so, I decrement it by one because double
+moves are allowed in this case.
+
+Since the problem was relaxed by allowing the double moves, it can never
+require more steps than the original problem, therefore it is admissible.
+And because it is admissible, it will produce an optimal solution.
